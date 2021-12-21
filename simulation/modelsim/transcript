@@ -1,0 +1,13 @@
+vsim work.MC6820 -voptargs=+acc
+# vsim work.MC6820 -voptargs="+acc" 
+# Start time: 23:06:51 on Dec 19,2021
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Error: (vopt-13130) Failed to find design unit MC6820.
+#         Searched libraries:
+#             work
+# Optimization failed
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=1, Warnings=0.
+# Error loading design
+# End time: 23:06:53 on Dec 19,2021, Elapsed time: 0:00:02
+# Errors: 1, Warnings: 4
+quit
