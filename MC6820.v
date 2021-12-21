@@ -97,7 +97,8 @@ module MC6820(
 
             // CTRL REGISTER
             CTRLWORD = {RS[1:0], CRA[2]};
-            case (CTRLWORD)
+          	$display("%b",  CTRLWORD);
+          case (CTRLWORD)
                 `CNTRL_PREG_A: // Peripherial Reg A
                 begin
                     if (rw) begin
@@ -140,6 +141,7 @@ module MC6820(
                 `CNTRL_CRA_ALT: // CRA Reg A
                 begin
                     if (rw) begin
+                      $display("READ CRA IN D0");
                         DO <= CRA;
                     end
                     else begin

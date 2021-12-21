@@ -51,6 +51,7 @@ module MC6820_bench();
                irqB);
 
     initial begin
+      
         reset_n = 0;
         rw = 0;
         enable = 1;
@@ -61,88 +62,37 @@ module MC6820_bench();
          $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
 
 
-        // CTRL A READ
         reset_n = 1;
-        rw = 0;
         enable = 0;
-        PAI = 2;
-        PBI = 4;
-        DI = 8;
-
         RS [1] = 0;
         RS [0] = 1;
-
         #40
          $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
 
-        // WRITE REG A INTO D0
-        reset_n = 1;
         rw = 1;
         enable = 1;
-        PAI = 2;
-        PBI = 4;
-        DI = 8;
-
-        RS [1] = 0;
-        RS [0] = 1;
-
         #40
          $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
 
 
-        // WRITE DI INTO CRA
-        reset_n = 1;
         rw = 0;
         enable = 0;
-        PAI = 2;
-        PBI = 4;
         DI = 251;
-
-        RS [1] = 0;
-        RS [0] = 1;
-
         #40
          $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
 
-
-        reset_n = 1;
-        rw = 0;
         enable = 1;
-        PAI = 2;
-        PBI = 4;
-        DI = 251;
-
-        RS [1] = 0;
-        RS [0] = 1;
-
         #40
          $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
 
-        // READ CRA INTO DO
-        reset_n = 1;
+
         rw = 1;
         enable = 0;
-        PAI = 2;
-        PBI = 4;
-        DI = 251;
-
-        RS [1] = 0;
-        RS [0] = 1;
-
         #40
          $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
 
 
-        reset_n = 1;
-        rw = 1;
         enable = 1;
-        PAI = 2;
-        PBI = 4;
-        DI = 251;
-
-        RS [1] = 0;
-        RS [0] = 1;
-
         #40
          $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
 
@@ -150,24 +100,39 @@ module MC6820_bench();
 
         // INTERRUPTS
         reset_n = 0;
-        rw = 1;
         enable = 0;
-        DI = 251;
         CA1 = 0;
 
         #40
-         $display("CA1 = %d, IRQA = %d", CA1, irqA );
+        $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
 
         reset_n = 1;
-        rw = 1;
         enable = 1;
-        DI = 251;
-        CA1 = 1;
 
         #40
          $display("CA1 = %d, IRQA = %d", CA1, irqA );
+        $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
 
+      
+      
+        RS [1] = 1;
+      RS [0] = 0;
+              CA1 = 1;
 
+        enable = 0;
+
+        #40
+         $display("CA1 = %d, IRQA = %d", CA1, irqA );
+        $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
+   	
+
+        enable = 1;
+
+        #40
+         $display("CA1 = %d, IRQA = %d", CA1, irqA );
+        $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
+   	
+      
         $finish;
 
 
