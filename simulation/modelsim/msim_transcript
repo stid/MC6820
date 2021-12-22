@@ -17,7 +17,10 @@
 # if {[file exists rtl_work]} {
 # 	vdel -lib rtl_work -all
 # }
+# ** Warning: (vdel-134) Unable to remove locked optimized design "_opt".  Locker is stid@RAZERBLADE-STID.
 # vlib rtl_work
+# ** Warning: (vlib-34) Library already exists at "rtl_work".
+# Errors: 0, Warnings: 1
 # vmap work rtl_work
 # Questa Intel Starter FPGA Edition-64 vmap 2021.2 Lib Mapping Utility 2021.04 Apr 14 2021
 # vmap work rtl_work 
@@ -26,50 +29,111 @@
 # 
 # vlog -vlog01compat -work work +incdir+C:/Users/stid/Desktop/MISTER/fpga/MC6820 {C:/Users/stid/Desktop/MISTER/fpga/MC6820/MC6820.v}
 # Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
-# Start time: 16:55:39 on Dec 20,2021
+# Start time: 19:18:32 on Dec 21,2021
 # vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/stid/Desktop/MISTER/fpga/MC6820" C:/Users/stid/Desktop/MISTER/fpga/MC6820/MC6820.v 
 # -- Compiling module MC6820
 # 
 # Top level modules:
 # 	MC6820
-# End time: 16:55:39 on Dec 20,2021, Elapsed time: 0:00:00
+# End time: 19:18:33 on Dec 21,2021, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
 # 
 # vlog -vlog01compat -work work +incdir+C:/Users/stid/Desktop/MISTER/fpga/MC6820 {C:/Users/stid/Desktop/MISTER/fpga/MC6820/MC6820_bench.v}
 # Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
-# Start time: 16:55:40 on Dec 20,2021
+# Start time: 19:18:33 on Dec 21,2021
 # vlog -reportprogress 300 -vlog01compat -work work "+incdir+C:/Users/stid/Desktop/MISTER/fpga/MC6820" C:/Users/stid/Desktop/MISTER/fpga/MC6820/MC6820_bench.v 
 # -- Compiling module MC6820_bench
 # 
 # Top level modules:
 # 	MC6820_bench
-# End time: 16:55:40 on Dec 20,2021, Elapsed time: 0:00:00
+# End time: 19:18:33 on Dec 21,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # 
 # vsim -t 1ps -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L cyclonev_ver -L cyclonev_hssi_ver -L cyclonev_pcie_hip_ver -L rtl_work -L work -voptargs="+acc"  MC6820_bench
 # vsim -t 1ps -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L cyclonev_ver -L cyclonev_hssi_ver -L cyclonev_pcie_hip_ver -L rtl_work -L work -voptargs=""+acc"" MC6820_bench 
-# Start time: 16:55:40 on Dec 20,2021
+# Start time: 19:18:33 on Dec 21,2021
 # ** Note: (vsim-3812) Design is being optimized...
 # Loading work.MC6820_bench(fast)
 # Loading work.MC6820(fast)
 # 
 # add wave *
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: stid  Hostname: RAZERBLADE-STID  ProcessID: 28196
+#           Attempting to use alternate WLF file "./wlftbhk9mf".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftbhk9mf
 # view structure
 # .main_pane.structure.interior.cs.body.struct
 # view signals
 # .main_pane.objects.interior.cs.body.tree
 # run -all
-# DI =   8, DO =   x, reset = 0, rw = 0, enable = 1
-# DI =   8, DO =   x, reset = 1, rw = 0, enable = 0
-# DI =   8, DO =   0, reset = 1, rw = 1, enable = 1
-# DI = 251, DO =   0, reset = 1, rw = 0, enable = 0
-# DI = 251, DO =   0, reset = 1, rw = 0, enable = 1
-# DI = 251, DO =   0, reset = 1, rw = 1, enable = 0
-# DI = 251, DO =  59, reset = 1, rw = 1, enable = 1
-# CA1 = 1, IRQA = 1
-# CRA[1] && CA1
-# CA1 = 1, IRQA = 0
-# ** Note: $finish    : C:/Users/stid/Desktop/MISTER/fpga/MC6820/MC6820_bench.v(170)
-#    Time: 360 ns  Iteration: 0  Instance: /MC6820_bench
+# t=  0 enable=0, reset_n=1, irqA=1, CA1=1 DI=xxxxxxxx, DO=xxxxxxxx RS=xx
+#  ---------------
+# RESET!
+# t= 10 enable=1, reset_n=0, irqA=1, CA1=1 DI=xxxxxxxx, DO=xxxxxxxx RS=xx
+#  ---------------
+# t= 20 enable=0, reset_n=1, irqA=1, CA1=1 DI=xxxxxxxx, DO=xxxxxxxx RS=xx
+#  ---------------
+# t= 30 enable=1, reset_n=1, irqA=1, CA1=1 DI=xxxxxxxx, DO=xxxxxxxx RS=xx
+#  ---------------
+# 1 READ REG A in DO
+# t= 40 enable=0, reset_n=1, irqA=1, CA1=1 DI=xxxxxxxx, DO=xxxxxxxx RS=01
+#  ---------------
+# READ CRA!!
+# t= 50 enable=1, reset_n=1, irqA=1, CA1=1 DI=xxxxxxxx, DO=00000000 RS=01
+#  ---------------
+# 2 WRITE DI to REGA
+# t= 60 enable=0, reset_n=1, irqA=1, CA1=1 DI=00000001, DO=00000000 RS=01
+#  ---------------
+# WRITE CRA!!
+# t= 70 enable=1, reset_n=1, irqA=1, CA1=1 DI=00000001, DO=00000000 RS=01
+#  ---------------
+# 3 READ REG A in DO
+# t= 80 enable=0, reset_n=1, irqA=1, CA1=1 DI=00000001, DO=00000000 RS=01
+#  ---------------
+# READ CRA!!
+# t= 90 enable=1, reset_n=1, irqA=1, CA1=1 DI=00000001, DO=00000001 RS=01
+#  ---------------
+# 4 TRIGGER CA1
+# t=100 enable=0, reset_n=1, irqA=1, CA1=0 DI=00000001, DO=00000001 RS=01
+#  ---------------
+# READ CRA!!
+# t=110 enable=1, reset_n=1, irqA=0, CA1=0 DI=00000001, DO=10000001 RS=01
+#  ---------------
+# 5 DETRIGGER CA1
+# t=120 enable=0, reset_n=1, irqA=0, CA1=1 DI=00000001, DO=10000001 RS=01
+#  ---------------
+# READ CRA!!
+# t=130 enable=1, reset_n=1, irqA=0, CA1=1 DI=00000001, DO=10000001 RS=01
+#  ---------------
+# 6 READ REG A in DO
+# t=140 enable=0, reset_n=1, irqA=0, CA1=1 DI=00000001, DO=10000001 RS=01
+#  ---------------
+# READ CRA!!
+# t=150 enable=1, reset_n=1, irqA=0, CA1=1 DI=00000001, DO=10000001 RS=01
+#  ---------------
+# 7 WRITE DI to REGA SET PERIFERIAL
+# t=160 enable=0, reset_n=1, irqA=0, CA1=1 DI=00000101, DO=10000001 RS=01
+#  ---------------
+# WRITE CRA!!
+# t=170 enable=1, reset_n=1, irqA=0, CA1=1 DI=00000101, DO=10000001 RS=01
+#  ---------------
+# 8 READ PERIFERIAL A in DO
+# t=180 enable=0, reset_n=1, irqA=0, CA1=1 DI=00000101, DO=10000001 RS=00
+#  ---------------
+# CNTRL_PREG_A
+# t=190 enable=1, reset_n=1, irqA=1, CA1=1 DI=00000101, DO=11111111 RS=00
+#  ---------------
+# 9 READ REG A in DO
+# t=200 enable=0, reset_n=1, irqA=1, CA1=1 DI=00000101, DO=11111111 RS=01
+#  ---------------
+# READ CRA!!
+# t=210 enable=1, reset_n=1, irqA=1, CA1=1 DI=00000101, DO=00000101 RS=01
+#  ---------------
+# ** Note: $finish    : C:/Users/stid/Desktop/MISTER/fpga/MC6820/MC6820_bench.v(136)
+#    Time: 220 ns  Iteration: 0  Instance: /MC6820_bench
 # 1
-# Break in Module MC6820_bench at C:/Users/stid/Desktop/MISTER/fpga/MC6820/MC6820_bench.v line 170
+# Break in Module MC6820_bench at C:/Users/stid/Desktop/MISTER/fpga/MC6820/MC6820_bench.v line 136
+# Causality operation skipped due to absence of debug database file
+# End time: 19:48:09 on Dec 21,2021, Elapsed time: 0:29:36
+# Errors: 0, Warnings: 2

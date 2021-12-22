@@ -9,8 +9,13 @@
 `define CNTRL_CRA_ALT 3'b011
 `define CNTRL_CRB     3'b110
 `define CNTRL_CRB_ALT 3'b111
-
 `define CHIP_SELECTED 3'b011
+
+`define CAINTWORD {CRA[1:0], CA1}
+`define CBINTWORD {CRB[1:0], CB1}
+`define CRGWORD {RS[1:0], CRA[2]}
+
+
 
 module MC6820(
         input [ 7:0] DI,		    // DATA INPUT
@@ -46,64 +51,47 @@ module MC6820(
     reg [7:0] DDRA;       // DATA DIRECTION REGISTER A (0=IN, 1=OUT)
     reg [7:0] DDRB;       // DATA DIRECTION REGISTER B (0=IN, 1=OUT)
 
-    reg [2:0] CTRLWORD;   // CNTRL AGGREGATED WORD
+
+    // CRA/B
+    // -------------------------------------------------------
+    //     7   |   6    | 5 | 4 | 3 |   2    |    1   |   0
+    // -------------------------------------------------------
+    //   IRQ1  |  IRQ2  |    CA2    | DDRA/B |    CA1 Control
+    // -------------------------------------------------------
+
+
 
     initial begin
         irqA <= 1;
         irqB <= 1;
     end
-
-
-
-
-
+  
 
     always @(posedge enable or negedge reset_n)
         if (!reset_n)
             reset();
         else begin
 
-            // INTERRUPTS A
-            if (!CRA[1] && !CA1) begin
-                $display("!CRA[1] && !CA1");
-                CRA[7] = 1;
-                if (CRA[0]) begin
-                    irqA <= 0;
-                end
+
+          if ((`CAINTWORD == 3'b000) || (`CAINTWORD == 3'b010) || (`CAINTWORD == 3'b101) || (`CAINTWORD == 3'b111) ) begin
+                CRA[7] = !(CA1 ^ CRA[1]);   // Interrupt Triggered
+                irqA <= !(CRA[7] && CRA[0]);    // Interrupt need to be notified (trigger LOW)
             end
-            else if (CRA[1] && CA1) begin
-                $display("CRA[1] && CA1");
-                CRA[7] = 1;
-                if (CRA[0]) begin
-                    irqA <= 0;
-                end
-            end
-            // INTERRUPTS B
-            if (!CRB[1] && !CB1) begin
-                $display("!CRB[1] && !CB1");
-                CRB[7] = 1;
-                if (CRB[0]) begin
-                    irqB <= 0;
-                end
-            end
-            else if (CRB[1] && CB1) begin
-                $display("CRB[1] && CB1");
-                CRB[7] = 1;
-                if (CRB[0]) begin
-                    irqB <= 0;
-                end
+          if ((`CBINTWORD == 3'b000) || (`CBINTWORD == 3'b010) || (`CBINTWORD == 3'b101) || (`CBINTWORD == 3'b111) ) begin
+                CRB[7] = !(CB1 ^ CRB[1]);   // Interrupt Triggered
+                irqB <= !(CRB[7] && CRB[0]);    // Interrupt need to be notified (trigger LOW)
             end
 
 
             // CTRL REGISTER
-            CTRLWORD = {RS[1:0], CRA[2]};
-          	$display("%b",  CTRLWORD);
-          case (CTRLWORD)
+          case (`CRGWORD)
                 `CNTRL_PREG_A: // Peripherial Reg A
                 begin
                     if (rw) begin
                         DO <= PAI;
                         CRA[7] <= 0; // CLEAR INTERRUPT BIT A
+                        irqA <= 1;
+
                     end
                     else begin
                         PAO <= DI;
@@ -114,6 +102,7 @@ module MC6820(
                     if (rw) begin
                         DO <= PBI;
                         CRB[7] <= 0; // CLEAR INTERRUPT BIT B
+                        irqB <= 1;
                     end
                     else begin
                         PBO <= DI;
@@ -141,10 +130,10 @@ module MC6820(
                 `CNTRL_CRA_ALT: // CRA Reg A
                 begin
                     if (rw) begin
-                      $display("READ CRA IN D0");
                         DO <= CRA;
                     end
                     else begin
+                      $display("WRITE CRA!!");
                         CRA[5:0] <= DI[5:0];
                     end
                 end
@@ -164,6 +153,7 @@ module MC6820(
 
     task reset;
         begin
+          $display("RESET!");
             CRA <= 0;
             CRB <= 0;
             DDRA <= 0;

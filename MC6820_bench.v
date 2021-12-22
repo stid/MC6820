@@ -50,95 +50,88 @@ module MC6820_bench();
                irqA,
                irqB);
 
+  parameter PERIOD = 20;
+
     initial begin
+        enable = 1'b0;
+        forever begin
+            #10 enable = ~enable;
+        end
+    end
+
+    // Generate the reset
+    initial begin
+        reset_n = 1'b1;
+        #10
+         reset_n = 1'b0;
+        #10
+         reset_n = 1'b1;
+    end
+
+    initial begin
+      $monitor("t=%3d enable=%d, reset_n=%d, irqA=%d, CA1=%d DI=%b, DO=%b RS=%b\n ---------------",$time,enable, reset_n, irqA, CA1, DI, DO, RS );
+    end
+
+
+    initial begin
+        rw = 0;
+        CA1 = 1'b1;
+      	PAI=8'b11111111;
       
-        reset_n = 0;
-        rw = 0;
-        enable = 1;
-        PAI = 2;
-        PBI = 4;
-        DI = 8;
-        #40
-         $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
-
-
-        reset_n = 1;
-        enable = 0;
-        RS [1] = 0;
-        RS [0] = 1;
-        #40
-         $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
-
-        rw = 1;
-        enable = 1;
-        #40
-         $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
-
-
-        rw = 0;
-        enable = 0;
-        DI = 251;
-        #40
-         $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
-
-        enable = 1;
-        #40
-         $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
-
-
-        rw = 1;
-        enable = 0;
-        #40
-         $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
-
-
-        enable = 1;
-        #40
-         $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
-
-
+        #PERIOD
+        #PERIOD
+      
 
         // INTERRUPTS
-        reset_n = 0;
-        enable = 0;
-        CA1 = 0;
+      $display("1 READ REG A in DO");
+        rw=1;
+      	RS = 2'b01;
+        #PERIOD
 
-        #40
-        $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
-
-        reset_n = 1;
-        enable = 1;
-
-        #40
-         $display("CA1 = %d, IRQA = %d", CA1, irqA );
-        $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
+      $display("2 WRITE DI to REGA");
+        rw=0;
+      	RS = 2'b01;
+      	DI = 5'b00001;
+        #PERIOD
+ 
+      $display("3 READ REG A in DO");
+        rw=1;
+      	RS = 2'b01;
+        #PERIOD
 
       
+      $display("4 TRIGGER CA1");
+        rw=1;
+      	CA1=0;
+        #PERIOD
+
+      $display("5 DETRIGGER CA1");
+        rw=1;
+      	CA1=1;
+        #PERIOD
       
-        RS [1] = 1;
-      RS [0] = 0;
-              CA1 = 1;
-
-        enable = 0;
-
-        #40
-         $display("CA1 = %d, IRQA = %d", CA1, irqA );
-        $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
-   	
-
-        enable = 1;
-
-        #40
-         $display("CA1 = %d, IRQA = %d", CA1, irqA );
-        $display("DI = %d, DO = %d, reset = %d, rw = %d, enable = %d", DI, DO, reset_n, rw, enable );
-   	
       
-        $finish;
+      $display("6 READ REG A in DO");
+        rw=1;
+      	RS = 2'b01;
+        #PERIOD
+      
+      $display("7 WRITE DI to REGA SET PERIFERIAL");
+        rw=0;
+      	RS = 2'b01;
+      	DI = 5'b00101;
+        #PERIOD
 
+      $display("8 READ PERIFERIAL A in DO");
+        rw=1;
+      	RS = 2'b00;
+        #PERIOD
 
-
-
-
+      $display("9 READ REG A in DO");
+        rw=1;
+      	RS = 2'b01;
+        #PERIOD
+              $finish;
 
     end
 
