@@ -13,7 +13,11 @@
 
 `define CAINTWORD {CRA[1:0], CA1}
 `define CBINTWORD {CRB[1:0], CB1}
-`define CRGWORD {RS[1:0], CRA[2]}
+`define CRGWORD {RS[1:0], CRA[2]} // WE JUST NEED A to Infer B
+
+
+`define CA2ASOUTWORD {CRA[4], CRA[3]}
+`define CB2ASOUTWORD {CRB[4], CRB[3]}
 
 
 
@@ -51,6 +55,11 @@ module MC6820(
     reg [7:0] DDRA;       // DATA DIRECTION REGISTER A (0=IN, 1=OUT)
     reg [7:0] DDRB;       // DATA DIRECTION REGISTER B (0=IN, 1=OUT)
 
+    reg ADataRead;
+    reg BDataRead;
+    reg CA2SecondNegEdge;
+    reg CB2SecondPosEdge;
+
 
     // CRA/B
     // -------------------------------------------------------
@@ -65,33 +74,95 @@ module MC6820(
         irqA <= 1;
         irqB <= 1;
     end
-  
 
-    always @(posedge enable or negedge reset_n)
+
+    always @(enable or negedge reset_n)
         if (!reset_n)
             reset();
+
+    // E Negative Pulse
+        else if (!enable) begin
+
+            // CA2 AS OUTPUT
+            if (CRA[5]) begin
+                if ((`CA2ASOUTWORD == 2'b00 || `CA2ASOUTWORD == 2'b01) && ADataRead) begin
+                    CA2O <= 0;
+                    CA2SecondNegEdge <= `CA2ASOUTWORD == 2'b01;
+                    ADataRead <= 0;
+                end
+
+                // Second NegEdge After Deselect
+                if ((`CA2ASOUTWORD == 2'b01) && CA2SecondNegEdge) begin
+                    CA2O <= 1;
+                    CA2SecondNegEdge <= 0;
+                end                
+
+            end
+        end
         else begin
 
+            // CB2 AS OUTPUT
+            if (CRB[5]) begin
+                if ((`CB2ASOUTWORD == 2'b00 || `CB2ASOUTWORD == 2'b01) && BDataRead) begin
+                    CB2O <= 0;
+                    CB2SecondPosEdge <= `CB2ASOUTWORD == 2'b01;
+                    BDataRead <= 0;
+                end
 
-          if ((`CAINTWORD == 3'b000) || (`CAINTWORD == 3'b010) || (`CAINTWORD == 3'b101) || (`CAINTWORD == 3'b111) ) begin
+                // Second PosEdge After Deselect
+                if ((`CB2ASOUTWORD == 2'b01) && CB2SecondPosEdge) begin
+                    CA2O <= 1;
+                    CB2SecondPosEdge <= 0;
+                end    
+
+            end
+
+            // CA1 & CB1 Interrupt control
+            if ((`CAINTWORD == 3'b000) || (`CAINTWORD == 3'b010) || (`CAINTWORD == 3'b101) || (`CAINTWORD == 3'b111) ) begin
                 CRA[7] = !(CA1 ^ CRA[1]);   // Interrupt Triggered
+
+                // CA2 AS OUTPUT
+                if (CRA[5] && CRA[7] && `CA2ASOUTWORD == 2'b00) begin
+                    CA2O <= 1;
+                end
+
                 irqA <= !(CRA[7] && CRA[0]);    // Interrupt need to be notified (trigger LOW)
             end
-          if ((`CBINTWORD == 3'b000) || (`CBINTWORD == 3'b010) || (`CBINTWORD == 3'b101) || (`CBINTWORD == 3'b111) ) begin
+            if ((`CBINTWORD == 3'b000) || (`CBINTWORD == 3'b010) || (`CBINTWORD == 3'b101) || (`CBINTWORD == 3'b111) ) begin
                 CRB[7] = !(CB1 ^ CRB[1]);   // Interrupt Triggered
+
+                // CB2 AS OUTPUT
+                if (CRB[5] && CRB[7] && `CB2ASOUTWORD == 2'b00) begin
+                    CB2O <= 1;
+                end
+
+
                 irqB <= !(CRB[7] && CRB[0]);    // Interrupt need to be notified (trigger LOW)
             end
 
+            // CA2 & CB2 as Interrupt
+            if (!CRA[5]) begin
+                // As Interrupt Input
+                CRA[6] = !(CA2I ^ CRA[4]);   // Interrupt Triggered
+                irqA <= !(CRA[6] && CRA[3]);    // Interrupt need to be notified (trigger LOW)
+            end
+
+            if (!CRB[5]) begin
+                // Interrupt Input
+                CRB[6] = !(CA2I ^ CRB[4]);   // Interrupt Triggered
+                irqB <= !(CRB[6] && CRB[3]);    // Interrupt need to be notified (trigger LOW)
+            end
 
             // CTRL REGISTER
-          case (`CRGWORD)
+            case (`CRGWORD)
                 `CNTRL_PREG_A: // Peripherial Reg A
                 begin
                     if (rw) begin
                         DO <= PAI;
                         CRA[7] <= 0; // CLEAR INTERRUPT BIT A
+                        CRA[6] <= 0; // CLEAR INTERRUPT BIT A
                         irqA <= 1;
-
+                        ADataRead <=1;
                     end
                     else begin
                         PAO <= DI;
@@ -102,7 +173,9 @@ module MC6820(
                     if (rw) begin
                         DO <= PBI;
                         CRB[7] <= 0; // CLEAR INTERRUPT BIT B
+                        CRB[6] <= 0; // CLEAR INTERRUPT BIT B
                         irqB <= 1;
+                        BDataRead <=1;
                     end
                     else begin
                         PBO <= DI;
@@ -133,7 +206,13 @@ module MC6820(
                         DO <= CRA;
                     end
                     else begin
-                      $display("WRITE CRA!!");
+                        // CA2 AS OUTPUT
+                        if (CRA[5] && {CRA[4], DI[3]} == 2'b10) begin
+                            CA2O <= 0;
+                        end
+                        else if (CRA[5] && {CRA[4], DI[3]} == 2'b11) begin
+                            CA2O <= 1;
+                        end
                         CRA[5:0] <= DI[5:0];
                     end
                 end
@@ -144,6 +223,13 @@ module MC6820(
                         DO <= CRB;
                     end
                     else begin
+                        // CB2 AS OUTPUT
+                        if (CRB[5] && {CRB[4], DI[3]} == 2'b10) begin
+                            CB2O <= 0;
+                        end
+                        else if (CRB[5] && {CRB[4], DI[3]} == 2'b11) begin
+                            CB2O <= 1;
+                        end
                         CRB[5:0] <= DI[5:0];
                     end
                 end
@@ -153,11 +239,12 @@ module MC6820(
 
     task reset;
         begin
-          $display("RESET!");
+            $display("RESET!");
             CRA <= 0;
             CRB <= 0;
             DDRA <= 0;
             DDRB <= 0;
+            ADataRead=0;
         end
     endtask
 

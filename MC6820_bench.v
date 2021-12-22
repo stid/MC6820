@@ -50,88 +50,89 @@ module MC6820_bench();
                irqA,
                irqB);
 
-  parameter PERIOD = 20;
+    parameter HALF_PERIOD = 10;
+    parameter PERIOD = HALF_PERIOD*2;
 
     initial begin
         enable = 1'b0;
         forever begin
-            #10 enable = ~enable;
+            #HALF_PERIOD enable = ~enable;
         end
     end
 
     // Generate the reset
     initial begin
         reset_n = 1'b1;
-        #10
+        #HALF_PERIOD
          reset_n = 1'b0;
-        #10
+        #HALF_PERIOD
          reset_n = 1'b1;
     end
 
     initial begin
-      $monitor("t=%3d enable=%d, reset_n=%d, irqA=%d, CA1=%d DI=%b, DO=%b RS=%b\n ---------------",$time,enable, reset_n, irqA, CA1, DI, DO, RS );
+        $monitor("t=%3d enable=%d, reset_n=%d, irqA=%d, CA1=%d DI=%b, DO=%b RS=%b\n ---------------",$time,enable, reset_n, irqA, CA1, DI, DO, RS );
     end
 
 
     initial begin
         rw = 0;
         CA1 = 1'b1;
-      	PAI=8'b11111111;
-      
-        #PERIOD
-        #PERIOD
-      
+        PAI=8'b11111111;
 
-        // INTERRUPTS
-      $display("1 READ REG A in DO");
+        #PERIOD
+         #PERIOD
+
+
+         // INTERRUPTS
+         $display("1 READ REG A in DO");
         rw=1;
-      	RS = 2'b01;
+        RS = 2'b01;
         #PERIOD
 
-      $display("2 WRITE DI to REGA");
+         $display("2 WRITE DI to REGA");
         rw=0;
-      	RS = 2'b01;
-      	DI = 5'b00001;
-        #PERIOD
- 
-      $display("3 READ REG A in DO");
-        rw=1;
-      	RS = 2'b01;
+        RS = 2'b01;
+        DI = 5'b00001;
         #PERIOD
 
-      
-      $display("4 TRIGGER CA1");
+         $display("3 READ REG A in DO");
         rw=1;
-      	CA1=0;
+        RS = 2'b01;
         #PERIOD
 
-      $display("5 DETRIGGER CA1");
+
+         $display("4 TRIGGER CA1");
         rw=1;
-      	CA1=1;
+        CA1=0;
         #PERIOD
-      
-      
-      $display("6 READ REG A in DO");
+
+         $display("5 DETRIGGER CA1");
         rw=1;
-      	RS = 2'b01;
+        CA1=1;
         #PERIOD
-      
-      $display("7 WRITE DI to REGA SET PERIFERIAL");
+
+
+         $display("6 READ REG A in DO");
+        rw=1;
+        RS = 2'b01;
+        #PERIOD
+
+         $display("7 WRITE DI to REGA SET PERIFERIAL");
         rw=0;
-      	RS = 2'b01;
-      	DI = 5'b00101;
+        RS = 2'b01;
+        DI = 5'b00101;
         #PERIOD
 
-      $display("8 READ PERIFERIAL A in DO");
+         $display("8 READ PERIFERIAL A in DO");
         rw=1;
-      	RS = 2'b00;
+        RS = 2'b00;
         #PERIOD
 
-      $display("9 READ REG A in DO");
+         $display("9 READ REG A in DO");
         rw=1;
-      	RS = 2'b01;
+        RS = 2'b01;
         #PERIOD
-              $finish;
+         $finish;
 
     end
 
