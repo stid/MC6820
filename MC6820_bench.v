@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+`timescale 1us/1us
 
 module MC6820_bench();
     reg [ 7:0] DI;		// DATA
@@ -29,28 +29,28 @@ module MC6820_bench();
     wire CA2O;
     wire CB2O;
 
-    MC6820 myMC6820(
-               DI,
-               DO,
-               PAI,
-               PAO,
-               PBI,
-               PBO,
-               CA1,
-               CB1,
-               CA2I,
-               CA2O,
-               CB2I,
-               CB2O,
-               CS,
-               RS,
-               rw,
-               enable,
-               reset_n,
-               irqA,
-               irqB);
+    MC6820B myMC6820(
+                DI,
+                DO,
+                PAI,
+                PAO,
+                PBI,
+                PBO,
+                CA1,
+                CB1,
+                CA2I,
+                CA2O,
+                CB2I,
+                CB2O,
+                CS,
+                RS,
+                rw,
+                enable,
+                reset_n,
+                irqA,
+                irqB);
 
-    parameter HALF_PERIOD = 10;
+    parameter HALF_PERIOD = 1;
     parameter PERIOD = HALF_PERIOD*2;
 
     initial begin
@@ -77,7 +77,15 @@ module MC6820_bench();
     initial begin
         rw = 0;
         CA1 = 1'b1;
+        CB1 = 1'b1;
         PAI=8'b11111111;
+        PBI=8'b11111111;
+        DI=0;
+        CA2I= 1'b1;
+        CB2I= 1'b1;
+        CS=3'b011;
+        RS = 2'b00;
+
 
         #PERIOD
          #PERIOD
@@ -132,6 +140,32 @@ module MC6820_bench();
         rw=1;
         RS = 2'b01;
         #PERIOD
+
+         $display("4 TRIGGER CA1 AGAIN AFTER P READ");
+        rw=1;
+        CA1=0;
+        #PERIOD
+
+
+         $display("DESELECT");
+        rw=1;
+        CA1=1;
+        CS=0;
+        #PERIOD
+
+         $display("4 TRIGGER CA1 AGAIN AFTER SELECT DESELECT");
+        rw=1;
+        CA1=0;
+        #PERIOD
+
+
+         $display("SELECT");
+        rw=1;
+        CA1=1;
+        CS=3'b011;
+        #PERIOD
+
+
          $finish;
 
     end

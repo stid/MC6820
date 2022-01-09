@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"name": "6821_hack",
+			"path": "Arduino\\6821_hack"
+		},
+		{
+			"name": "65C21Mega",
+			"path": "Arduino\\65C21Mega"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.asm": "asm-intel-x86-generic",
+			"arduino.h": "c"
+		}
+	}
+}
